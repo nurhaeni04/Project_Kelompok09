@@ -1,0 +1,141 @@
+openapi: 3.0.3
+
+info:
+  title: War Tiket Konser API
+  version: 1.0.0
+  description: >
+    Kontrak API untuk sistem pembelian tiket konser
+    berbasis microservices.
+
+
+servers:
+  - url: http://localhost:8080
+
+
+paths:
+
+
+  /events:
+    get:
+      summary: Mendapatkan daftar konser
+
+      parameters:
+
+        - name: page
+          in: query
+          description: Nomor halaman
+          required: false
+          schema:
+            type: integer
+            default: 1
+
+        - name: limit
+          in: query
+          description: Jumlah data per halaman
+          required: false
+          schema:
+            type: integer
+            default: 20
+
+
+      responses:
+
+        "200":
+          description: Daftar konser berhasil diperoleh
+
+
+        "429":
+          description: Terlalu banyak request
+
+
+
+
+  /tickets:
+
+    get:
+
+      summary: Mendapatkan daftar tiket konser
+
+
+      responses:
+
+        "200":
+
+          description: Daftar tiket berhasil diperoleh
+
+
+
+  /orders:
+
+    post:
+
+      summary: Membeli tiket konser
+
+
+      requestBody:
+
+        required: true
+
+        content:
+
+          application/json:
+
+            schema:
+
+              type: object
+
+              properties:
+
+                ticketId:
+
+                  type: integer
+                  example: 10
+
+
+                quantity:
+
+                  type: integer
+                  example: 2
+
+
+
+      responses:
+
+
+        "201":
+
+          description: Tiket berhasil dipesan
+
+
+
+        "409":
+
+          description: Kursi sudah habis atau sudah dipesan
+
+
+
+        "429":
+
+          description: Terlalu banyak request
+
+
+
+
+  /payments:
+
+    post:
+
+      summary: Melakukan pembayaran tiket
+
+
+      responses:
+
+
+        "201":
+
+          description: Pembayaran berhasil
+
+
+        "400":
+
+          description: Data pembayaran tidak valid

@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+
+  event-service:
+    image: war-tiket/event-service
+    container_name: event-service
+    ports:
+      - "3001:3000"
+
+
+  ticket-service:
+    image: war-tiket/ticket-service
+    container_name: ticket-service
+    ports:
+      - "3002:3000"
+
+
+  payment-service:
+    image: war-tiket/payment-service
+    container_name: payment-service
+    ports:
+      - "3003:3000"
+
+
+  notification-service:
+    image: war-tiket/notification-service
+    container_name: notification-service
+    ports:
+      - "3004:3000"
