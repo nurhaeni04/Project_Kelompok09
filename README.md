@@ -61,29 +61,3 @@ Data yang dikelola:
 
 ---
 
-# Context Map
-
-```mermaid
-flowchart TD
-
-A[Mobile Application]
-
-B[API Gateway :8080]
-
-C[event-service]
-
-D[ticket-service]
-
-E[payment-service]
-
-F[notification-service]
-
-
-A --> B
-
-B --> C
-B --> D
-
-D --> E
-
-E --> F
