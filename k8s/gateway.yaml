@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  nginx.conf: |
+    events { worker_connections 1024; }
+    http {
+      upstream event_service        { server event-service:3000; }
+      upstream ticket_service       { server ticket-service:3000; }
+      upstream payment_service      { server payment-service:3000; }
+      upstream notification_service { server notification-service:3000; }
+      server {
+        listen 8080;
+        location /health {
+          default_type application/json;
+          return 200 '{"status":"ok","gateway":"nginx-k8s"}';
+        }
+        location /events        { proxy_pass http://event_service; }
+        location /tickets       { proxy_pass http://ticket_service; }
+        location /orders        { proxy_pass http://ticket_service; }
+        location /payments      { proxy_pass http://payment_service; }
+        location /notifications { proxy_pass http://notification_service; }
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: gateway }
+  template:
+    metadata:
+      labels: { app: gateway }
+    spec:
+      containers:
+        - name: gateway
+          image: nginx:alpine
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+      volumes:
+        - name: config
+          configMap:
+            name: nginx-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+spec:
+  type: NodePort
+  selector: { app: gateway }
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080
